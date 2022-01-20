@@ -1,5 +1,5 @@
 file:
-  path: '/Users/rodrigo/data'
+  path: '/app/data'
   topic:
     name: topic-file
     partitions: 5
@@ -9,4 +9,4 @@ file:
       route: true
 spring:
   kafka:
-    bootstrap-servers: 'localhost:9092'
+    bootstrap-servers: 'kafka:9092'

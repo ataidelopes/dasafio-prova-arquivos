@@ -1,14 +1,12 @@
 file:
-  path: '/Users/rodrigo/data'
+  path: '/app/data'
   topic:
     name: topic-file
     partitions: 5
     replications: 1
-server:
-  port: 8081
 spring:
   kafka:
-    bootstrap-servers: 'localhost:9092'
+    bootstrap-servers: 'kafka:9092'
     consumer:
       group-id: group-file-id
       auto-offset-reset: earliest

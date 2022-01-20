@@ -1,11 +1,41 @@
 version: '3.6'
 services:
+  process-directory:
+    build:
+      context: ./prova-processor
+    container_name: process_directory
+    networks:
+      - process-network
+    volumes:
+      - ${HOME_PATH}:/app/data
+    tty: true
+    ports:
+      - "8081:8080"
+    depends_on:
+      - kafka
+
+  process-service:
+    build:
+      context: ./service-process-file
+    container_name: process_file
+    networks:
+      - process-network
+    volumes:
+      - ${HOME_PATH}:/app/data
+    tty: true
+    ports:
+      - "8080:8080"
+    depends_on:
+      - kafka
+
   zookeeper:
     image: confluentinc/cp-zookeeper:5.2.1
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_SYNC_LIMIT: 2
+    networks:
+      - process-network
 
   kafka:
     image: confluentinc/cp-kafka:5.2.1
@@ -13,9 +43,25 @@ services:
       - "9092:9092"
     depends_on:
       - zookeeper
+    healthcheck:
+      test: [ "CMD-SHELL", "kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --topic topic-1 --describe" ]
+      interval: 2s
+      timeout: 2s
+      retries: 15
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_LISTENERS: INTERNAL://:9092,OUTSIDE://:9094
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,OUTSIDE://host.docker.internal:9094,INTERNAL://localhost:9092
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_CREATE_TOPICS: "topic-1"
+    networks:
+      - process-network
+
+networks:
+  process-network:
+    driver: bridge
