@@ -1,5 +1,6 @@
 package com.prova.fileprocessor.route;
 
+import org.apache.camel.LoggingLevel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +28,7 @@ public class FileRoute extends RouteBuilderSupport {
         final var fileName = getNameFile(timeReadFile);
 
         from(getEndpointName(fileName))
+                .log(LoggingLevel.INFO, "consumindo o arquivo: " + fileName)
                 .setHeader(HEADER_NAME_FILE, constant(timeReadFile))
                 .autoStartup(enableFile)
                 .process("fileProcessor");

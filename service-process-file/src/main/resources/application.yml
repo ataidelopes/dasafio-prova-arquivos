@@ -2,7 +2,7 @@ file:
   path: '/app/data'
   topic:
     name: topic-file
-    partitions: 5
+    partitions: 1
     replications: 1
 spring:
   kafka:
