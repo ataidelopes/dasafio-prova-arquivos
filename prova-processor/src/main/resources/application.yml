@@ -1,0 +1,12 @@
+file:
+  path: '/Users/rodrigo/data'
+  topic:
+    name: topic-file
+    partitions: 5
+    replications: 1
+  enable:
+    file:
+      route: true
+spring:
+  kafka:
+    bootstrap-servers: 'localhost:9092'
